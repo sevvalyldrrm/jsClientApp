@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <br />
+      <button class="btn btn-primary" onclick="getProducts()">
+        Get Products
+      </button>
+      <button class="btn btn-secondary" onclick="getProductById()">
+        Get Product
+      </button>
+      <button class="btn btn-danger" onclick="login()">Login</button>
+      <div id="divProducts"></div>
+    </div>
+
+    <script>
+      const login = async () => {
+        const response = await fetch("https://localhost:7288/api/users/login", {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify({
+            email: "info@sevval.com",
+            password: "123456",
+          }),
+        });
+        const result = await response.json();
+        localStorage.setItem("token", JSON.stringify(result.token));
+      };
+
+      const getProducts = async () => {
+        const response = await fetch("https://localhost:7288/api/products");
+        const products = await response.json();
+        displayProducts(products);
+      };
+
+      const getProductById = async () => {
+        const token = JSON.parse(localStorage.getItem("token"));
+        const response = await fetch("https://localhost:7288/api/products/4", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+        });
+        const product = await response.json();
+        displayProduct(product);
+      };
+
+
+      const displayProduct = (product) => {
+        const parent = document.getElementById("divProducts");
+
+          parent.innerHTML = `
+            <div>
+                <h5>${product.productName}</h5>
+                <p>${product.price}</p>
+            </div>
+            `;
+      };
+
+
+      const displayProducts = (products) => {
+        const parent = document.getElementById("divProducts");
+
+        products.forEach((prd) => {
+          parent.innerHTML += `
+            <div>
+                <h5>${prd.productName}</h5>
+                <p>${prd.price}</p>
+            </div>
+            `;
+        });
+      };
+    </script>
+  </body>
+</html>
